@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+   phoenix:
+      build: ./Backend
+      # volumes:
+      #    - .:/Backend
+      # env_file:
+      #    - Backend/.env
+      environment:
+         PGUSER: postgres
+         PGPASSWORD: postgres
+         PGDATABASE: postgres
+         PGHOST: postgres
+         PGPORT: 5432
+      ports:
+         - '4000:4000'
+      depends_on:
+         - postgres
+      # networks:
+      #    - timemanager_dev
+   postgres:
+      image: postgres:latest
+      # env_file:
+      #    - ./Backend/.env
+      environment:
+         POSTGRES_USER: postgres
+         POSTGRES_PASSWORD: postgres
+         PGDATA: /var/lib/postgres/data/pgdata
+      ports:
+         - "5432:5432"
+      # restart: always
+      volumes:
+         - postgres:/var/lib/postgres/data
+      # networks:
+      #    - db
+
+   vuejs:
+      build: ./Frontend
+      # volumes:
+      #    - vuejs:/var/www/html/vuejs
+      ports:
+         - "8080:8080"
+
+volumes:
+   postgres:
+   vuejs:
+
+# networks:
+#    db:
