@@ -9,9 +9,9 @@ services:
       #    - Backend/.env
       environment:
          PGUSER: postgres
-         PGPASSWORD: postgres
+         PGPASSWORD: Azerty123&
          PGDATABASE: postgres
-         PGHOST: postgres
+         PGHOST: posgrestimemanager.postgres.database.azure.com
          PGPORT: 5432
       ports:
          - '4000:4000'
