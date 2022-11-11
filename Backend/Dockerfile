@@ -14,6 +14,9 @@ RUN mix phx.new timeManager –app timeManager –module Todolist –no-html –
 RUN mix local.rebar --force
 RUN mix deps.get
 
+# RUN mix ecto.create
+RUN mix ecto.migrate
 EXPOSE 4000
 
 CMD [ "mix", "phx.server" ]
+# CMD [ "mix", "ecto.migrate" ]

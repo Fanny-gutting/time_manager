@@ -12,7 +12,7 @@ config :timeManager,
 
 # Configures the endpoint
 config :timeManager, TimeManagerWeb.Endpoint,
-  url: [host: "localhost"],
+  url: [host: System.get_env("HOST")],
   render_errors: [view: TimeManagerWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: TimeManager.PubSub,
   live_view: [signing_salt: "wKkzebb6"]
