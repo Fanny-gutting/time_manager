@@ -189,12 +189,12 @@ function filterTeamUsers(teams: Array<any>) {
     );
 
     teams.filter((team) =>
-        team.users.filter((user) =>
+        team.users.filter((user: any) =>
             console.log("user name = ", user.username)
         )
     );
     return teams.filter((team) =>
-        team.users.filter((user) =>
+        team.users.filter((user: any) =>
             user.username.toLowerCase().includes(inputTeams.value.toLowerCase())
         )
     );
