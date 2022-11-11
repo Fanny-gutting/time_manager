@@ -15,8 +15,9 @@ RUN mix local.rebar --force
 RUN mix deps.get
 
 # RUN mix ecto.create
-RUN mix ecto.migrate
+# RUN mix ecto.migrate
 EXPOSE 4000
 
+ENTRYPOINT [ "mix", "ecto.migrate" ]
 CMD [ "mix", "phx.server" ]
-# CMD [ "mix", "ecto.migrate" ]
+# RUN mix phx
