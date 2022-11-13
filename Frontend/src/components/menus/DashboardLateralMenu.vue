@@ -13,21 +13,29 @@ export default {
     methods: {
         settingsMenu(){
             console.log("settings");
-            this.$emit('menuSelection', "2");
+            this.$emit('menuSelection', "2", this.UserId, this.UserEmail, this.UserUsername, this.UserStatus);
         },
         infoMenu(){
             console.log("info");
-            this.$emit('menuSelection', "3");
+            this.$emit('menuSelection', "3", this.UserId, this.UserEmail, this.UserUsername, this.UserStatus);
         },
-        logInMenu(){
-            console.log("logout");
-            this.$emit('menuSelection', "0");
-        }
+        async logOut() {
+            try {
+                console.log("sign out");
+                let res = await axios.delete('http://localhost:4000/api/users/sign_out');
+                let data = res.data;
+                console.log("data = ", data)
+                this.$emit('menuSelection', "0");
+            } catch (error) {
+                console.log(error);
+            }
+        },
     }
 }
 </script>
 <script lang="ts" setup>
 import { RouterLink, RouterView } from 'vue-router'
+import axios from 'axios';
 </script>
 
 <template>
@@ -40,18 +48,18 @@ import { RouterLink, RouterView } from 'vue-router'
         <div class="settings-row">
             <button v-on:click="settingsMenu()" class="btn btn-primary btn-ghost text-lightgray hover:text-yellow">settings</button>
             <button v-on:click="infoMenu()" class="btn btn-primary btn-ghost text-lightgray hover:text-yellow">info</button>
-            <button v-on:click="logInMenu()" class="btn btn-primary btn-ghost text-lightgray hover:text-yellow">log out</button>
+            <RouterLink class="btn btn-primary btn-ghost text-lightgray hover:text-yellow" to="/" v-on:click="logOut()">log out</RouterLink>
         </div>
         <nav>
             <li><RouterLink to="/clocking" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-lightgray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Report departure/arrival</RouterLink></li>
-            <li><RouterLink to="/user" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-lightgray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Dasboard</RouterLink></li>
+            <li><RouterLink to="/dashboard" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-lightgray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Dasboard</RouterLink></li>
             <!-- Everybody's functions above -->
             <li v-if="userType!=='employee'"><RouterLink to="/manageTeamsMenu" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-gray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Manage teams</RouterLink></li>
             <!-- in Manage teams, dealing with creation of teams, assignation of employees in them, and also viewing the teams average working hours -->
-            <li v-if="userType==='manager'"><RouterLink to="/user" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-gray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Employee's dashboards</RouterLink></li>
+            <li v-if="userType==='manager'"><RouterLink to="/dashboard" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-gray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Employee's dashboards</RouterLink></li>
             <!-- in Employee's dashboard, also shows the employees working hours -->
             <!-- Manager and General manager functions above -->
-            <li v-if="userType!=='employee' && userType!=='manager'"><RouterLink to="/user" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-gray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Employee and manager's dashboards</RouterLink></li>
+            <li v-if="userType!=='employee' && userType!=='manager'"><RouterLink to="/dashboard" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-gray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Employee and manager's dashboards</RouterLink></li>
             <!-- same thing as "Employee's dashboards" above, just a name changer for the general manager -->
             <li v-if="userType!=='employee' && userType!=='manager'"><RouterLink to="/manageAccountsMenu" class="text-lightgray hover:text-yellow hover:bg-transparent focus:text-yellow focus:bg-gray focus:border-l-4 focus:border-t-0 focus:border-b-0 focus:border-r-0 focus:border-yellow">Manage accounts</RouterLink></li>
             <!-- in manage accounts, deals with creation, modification, and deletion of accounts, as well as the promotion of accounts -->
@@ -60,7 +68,7 @@ import { RouterLink, RouterView } from 'vue-router'
         </nav>
     </div>
     <div class="main">
-        <RouterView :UserId="UserId" />
+        <RouterView />
     </div>
 </template>
 

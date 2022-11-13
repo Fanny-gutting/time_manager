@@ -15,6 +15,10 @@ export default {
                 type: String,
                 default: "",
             },
+            password: {
+                type: String,
+                default: "",
+            },
             username: {
                 type: String,
                 default: "",
@@ -25,7 +29,7 @@ export default {
             },
             statusName: {
                 type: String,
-                default: "Employee",
+                default: "status",
             },
         }
     },
@@ -59,6 +63,8 @@ export default {
             this.username.default = "";
             this.email.default = "";
             this.status.default = 3;
+            this.statusName.default = "status";
+
         },
         setStatus(role: string) {
 
@@ -82,6 +88,7 @@ export default {
                         username: this.username.default,
                         email: this.email.default,
                         status: this.status.default,
+                        password: this.password.default,
                     }
                 };
                 let res = await axios.post('http://localhost:4000/api/users', payload);
@@ -91,14 +98,16 @@ export default {
                 this.id.default = 0;
                 this.username.default = "";
                 this.email.default = "";
+                this.password.default = "";
                 this.status.default = 3;
+                this.statusName.default = "status";
             } catch (error) {
                 console.log(error);
             }
         },
-        async DeleteUser(user: { id: number, email: string; status: number; username: string; } ) {
+        async DeleteUser(id: number) {
             try {
-                let res = await axios.delete('http://localhost:4000/api/' + user.id);
+                let res = await axios.delete('http://localhost:4000/api/users/' + id);
 
                 let data = res.data;
                 console.log(data);
@@ -106,6 +115,8 @@ export default {
                 this.username.default = "";
                 this.email.default = "";
                 this.status.default = 3;
+                this.statusName.default = "status";
+
             } catch (error) {
                 console.log(error);
             }
@@ -130,6 +141,8 @@ export default {
                 this.username.default = "";
                 this.email.default = "";
                 this.status.default = 3;
+                this.statusName.default = "status";
+
             } catch (error) {
                 console.log(error);
             }
@@ -150,17 +163,18 @@ function filteredList(users: Array<any>) {
 </script>
 
 <template>
-    <div>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA</div>
     <div class="absolute top-0 left-100" >
     <label for="my-modal" class="btn">Create a new user</label>
     <input type="checkbox" id="my-modal" class="modal-toggle" />
     <div class="modal">
         <div class="modal-box relative" for="">
-            <label for="my-modal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <label for="my-modal" class="btn btn-sm btn-circle absolute right-2 top-2" v-on:click="resetUserModif()">✕</label>
             <p>e-mail :</p>
             <input v-model="email.default" placeholder="exemple@ex.com" />
             <p>username :</p>
             <input v-model="username.default" placeholder="username" />
+            <p>password (cannot be modified after creation) :</p>
+            <input v-model="password.default" placeholder="password" />
             <p>status :</p>
             <div class="collapse">
                 <input type="checkbox" class="peer" />
@@ -183,7 +197,7 @@ function filteredList(users: Array<any>) {
     <input type="checkbox" id="my-modal-2" class="modal-toggle" />
     <div class="modal">
         <div class="modal-box relative" for="">
-            <label for="my-modal-2" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+            <label for="my-modal-2" class="btn btn-sm btn-circle absolute right-2 top-2" v-on:click="resetUserModif()">✕</label>
 
             <input type="text" v-model="input" placeholder="Search user..." />
             <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md" v-for="user in filteredList(users)"
@@ -217,22 +231,29 @@ function filteredList(users: Array<any>) {
             </div>
         </div>
     </div>
-    <label for="my-modal3" class="btn" v-on:click="GetUsers()">Delete a user</label>
-    <input type="checkbox" id="my-modal3" class="modal-toggle" />
+    <label for="my-modal-3" class="btn" v-on:click="GetUsers()">Delete a user</label>
+    <input type="checkbox" id="my-modal-3" class="modal-toggle" />
     <div class="modal">
         <div class="modal-box relative" for="">
+            <label for="my-modal-3" class="btn btn-sm btn-circle absolute right-2 top-2" v-on:click="resetUserModif()">✕</label>
             <input type="text" v-model="input" placeholder="Search user..." />
             <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md" v-for="user in filteredList(users)"
-                v-on:click="DeleteUser(user)" :key="user">
+                v-on:click="setUserModif(user)" :key="user">
                 <p>{{ user.username }}</p>
             </div>
             <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md btn-disabled"
                 v-if="input && !filteredList(users).length">
                 <p>No results found</p>
             </div>
+            <p>e-mail :</p>
+            <p>{{email.default}}</p>
+            <p>username :</p>
+            <p>{{username.default}}</p>
+            <p>status :</p>
+            <p>{{statusName.default}}</p>
             <div class="modal-action">
-                <label for="my-modal3" class="btn" v-on:click="resetUserModif()">cancel</label>
-                <label for="my-modal3" class="btn" v-on:click="CreateUser()">create user</label>
+                <label for="my-modal-3" class="btn" v-on:click="resetUserModif()">cancel</label>
+                <label for="my-modal-3" class="btn" v-on:click="DeleteUser(id.default)">delete user</label>
             </div>
         </div>
     </div>

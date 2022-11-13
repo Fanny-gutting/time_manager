@@ -31,13 +31,9 @@ const router = createRouter({
             component: () => import('../components/WorkingTime.vue')
         },
         {
-            path: '/user',
-            component: () => import('../components/UserManager.vue')
+            path: '/dashboard',
+            component: () => import('../components/PersonalDashboard.vue')
         },
-        {
-            path: '/chartManager/:userid',
-            component: () => import('../components/ChartManager.vue')
-        }
     ]
 })
 

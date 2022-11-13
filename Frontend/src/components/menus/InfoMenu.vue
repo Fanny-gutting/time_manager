@@ -1,11 +1,18 @@
 <script lang="ts">
 export default {
+    props: {
+        userType: String,
+        UserId: Number,
+        UserEmail: String,
+        UserUsername: String,
+        UserStatus: Number
+    },
     emits: ['menuSelection'],
 
     methods: {
         DashboardMenu() {
             console.log("info");
-            this.$emit('menuSelection', "1");
+            this.$emit('menuSelection', "1", this.UserId, this.UserEmail, this.UserUsername, this.UserStatus);
         },
     }
 }
@@ -14,13 +21,17 @@ export default {
 <template>
     <button v-on:click="DashboardMenu()">back to dashboard</button>
 
-    <div>your name is david</div>
-    <div>your age is 45</div>
+    <p>username :</p>
+    <p>{{ UserUsername }}</p>
+    <p>e-mail :</p>
+    <p>{{ UserEmail }}</p>
+    <p>Role :</p>
+    <p>{{ userType }}</p>
 
 </template>
 
 <style scoped>
-input{
+input {
     color: #111;
 }
 </style>

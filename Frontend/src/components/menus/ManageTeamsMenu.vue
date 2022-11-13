@@ -3,7 +3,7 @@ export default {
     data() {
         return {
             users: [] as { id: Number, username: String, email: String, status: Number }[],
-            members: [] as {id: Number, username: String, email: String, status: Number} [],
+            members: [] as { id: Number, username: String, email: String, status: Number }[],
             teams: [] as {
                 id: Number, title: String, leader: {
                     email: String,
@@ -161,6 +161,38 @@ export default {
                 console.log(error);
             }
         },
+        async AddTeamMember(teamId: number, userId: number) {
+            try {
+                let payload = {
+                    team_user: {
+                        user_id: userId,
+                        team_id: teamId
+                    }
+                };
+                let res = await axios.post('http://localhost:4000/api/teamusers', payload);
+
+                let data = res.data;
+                console.log(data);
+                this.GetUsers();
+                this.GetTeams();
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        async DeleteTeamMember(teamId: number, userId: number) {
+            try {
+                console.log("team id = ", teamId)
+                console.log("user id = ", userId)
+                let res = await axios.delete('http://localhost:4000/api/teamusers/?team_id=' + teamId + '&user_id=' + userId);
+
+                let data = res.data;
+                console.log(data);
+                this.GetUsers();
+                this.GetTeams();
+            } catch (error) {
+                console.log(error);
+            }
+        },
     }
 }
 </script>
@@ -172,6 +204,7 @@ let inputTeams = ref("");
 
 
 function filterUsers(users: Array<any>) {
+    // console.log(users);
     return users.filter((user) =>
         user.username.toLowerCase().includes(inputUsers.value.toLowerCase())
     );
@@ -181,23 +214,37 @@ function filterTeams(teams: Array<any>) {
         team.title.toLowerCase().includes(inputTeams.value.toLowerCase())
     );
 }
-
-function filterTeamUsers(teams: Array<any>) {
-
-    teams.filter((team) =>
-    console.log("team users = ", team.users)
-    );
-
-    teams.filter((team) =>
-        team.users.filter((user: any) =>
-            console.log("user name = ", user.username)
-        )
-    );
-    return teams.filter((team) =>
-        team.users.filter((user: any) =>
-            user.username.toLowerCase().includes(inputTeams.value.toLowerCase())
-        )
-    );
+function filterTeamUsers(idteam: number, teams: Array<any>) {
+    let i = 0;
+    if (idteam) {
+        for (let i = 0; i < teams.length; i++) {
+            if (teams[i].id == idteam) {
+                return teams[i].users.filter((user: any) =>
+                    user.username.toLowerCase().includes(inputTeams.value.toLowerCase())
+                );
+            }
+        }
+    }
+}
+function filterNonTeamUsers(idteam: number, teams: Array<any>, users: Array<any>) {
+    let usersTemp = [];
+    usersTemp = users;
+    if (idteam) {
+        for (let i = 0; i < teams.length; i++) {
+            if (teams[i].id == idteam) {
+                for (let j = 0; j < teams[i].users.length; j++) {
+                    for (let k = 0; k < usersTemp.length; k++) {
+                        if (usersTemp[k].id == teams[i].users[j].id) {
+                            usersTemp.splice(k, 1);
+                        }
+                    }
+                }
+                return usersTemp.filter((user: any) =>
+                    user.username.toLowerCase().includes(inputUsers.value.toLowerCase())
+                );
+            }
+        }
+    }
 }
 </script>
 
@@ -266,7 +313,7 @@ function filterTeamUsers(teams: Array<any>) {
         </div>
 
 
-        <label for="my-modal3" class="btn" v-on:click="GetTeams()">Delete a team</label>
+        <label for="my-modal3" class="btn" v-on:click="GetTeams(), GetUsers()">Delete a team</label>
         <input type="checkbox" id="my-modal3" class="modal-toggle" />
         <div class="modal">
             <div class="modal-box relative" for="">
@@ -313,50 +360,45 @@ function filterTeamUsers(teams: Array<any>) {
 
                 <div class="collapse">
                     <input type="checkbox" class="peer" />
-                    <div class="collapse collapse-title collapse-arrow peer-checked:text-secondary-content">
+                    <div class="collapse collapse-title collapse-arrow peer-checked:text-secondary-content"
+                        v-on:click="GetTeams(), GetUsers()">
                         Remove Team members
                     </div>
                     <div class="collapse-content peer-checked:text-secondary-content ">
-                        <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md" v-for="user in filterTeamUsers(teams)"
-                            v-on:click="setTeamCreationModif(title.default, user)" :key="user">
+                        <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md"
+                            v-for="user in filterTeamUsers(id.default, teams)"
+                            v-on:click="DeleteTeamMember(id.default, user.id), GetTeams(), GetUsers(), filterTeamUsers(id.default, teams)"
+                            :key="user">
                             <p>{{ user.username }}</p>
                         </div>
                         <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md btn-disabled"
-                            v-if="inputUsers && !filterTeamUsers(teams).length">
+                            v-if="inputUsers && !filterTeamUsers(id.default, teams).length">
                             <p>No results found</p>
                         </div>
                     </div>
                 </div>
                 <div class="collapse">
                     <input type="checkbox" class="peer" />
-                    <div class="collapse collapse-title collapse-arrow peer-checked:text-secondary-content">
+                    <div class="collapse collapse-title collapse-arrow peer-checked:text-secondary-content"
+                        v-on:click="GetTeams(), GetUsers()">
                         Add team members
                     </div>
                     <div class="collapse-content peer-checked:text-secondary-content ">
-                        <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md" v-for="user in filterUsers(users)"
-                            v-on:click="setTeamCreationModif(title.default, user)" :key="user">
+                        <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md"
+                            v-for="user in filterNonTeamUsers(id.default, teams, users)"
+                            v-on:click="AddTeamMember(id.default, user.id), GetTeams(), GetUsers(), filterNonTeamUsers(id.default, teams, users)"
+                            :key="user">
                             <p>{{ user.username }}</p>
                         </div>
                         <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md btn-disabled"
-                            v-if="inputUsers && !filterUsers(users).length">
+                            v-if="inputUsers && !filterNonTeamUsers(id.default, teams, users).length">
                             <p>No results found</p>
                         </div>
                     </div>
                 </div>
-
-
-                <!-- <input type="text" v-model="inputUsers" placeholder="Search user..." />
-                <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md" v-for="user in filterUsers(users)"
-                    v-on:click="setTeamCreationModif(title.default, user)" :key="user">
-                    <p>{{ user.username }}</p>
-                </div>
-                <div class="btn btn-xs sm:btn-sm md:btn-md lg:btn-md btn-disabled"
-                    v-if="inputUsers && !filterUsers(users).length">
-                    <p>No results found</p>
-                </div> -->
                 <div class="modal-action">
                     <label for="my-modal4" class="btn" v-on:click="resetTeamModif()">cancel</label>
-                    <label for="my-modal4" class="btn" v-on:click="updateTeamModif()">update informations</label>
+                    <label for="my-modal4" class="btn" v-on:click="resetTeamModif()">update informations</label>
                 </div>
             </div>
         </div>
