@@ -85,9 +85,9 @@ export default {
                 console.log('http://localhost:4000/api/users/' + this.UserId)
 
                 let res = await axios.put('http://localhost:4000/api/users/' + this.UserId, payload);
-
                 let data = res.data;
                 console.log(data);
+                this.GetUsers();
             } catch (error) {
                 console.log(error);
             }

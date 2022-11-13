@@ -60,7 +60,7 @@ import { RouterLink, RouterView } from 'vue-router'
         </nav>
     </div>
     <div class="main">
-        <RouterView :UserId="UserId" />
+        <RouterView/>
     </div>
 </template>
 

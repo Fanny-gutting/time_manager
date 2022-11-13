@@ -44,7 +44,7 @@ export default {
                     console.log("data is = ", resp.data.data);
                     this.users = resp.data.data;
                     for (let i = 0; i < this.users.length; i++)
-                        if (this.users[i].username == this.username.default) {
+                        if (this.users[i].email == this.email.default) {
                             console.log("login");
                             check = true;
                             this.$emit('login', "1", this.users[i].id, this.users[i].email, this.users[i].username, this.users[i].status);
@@ -61,13 +61,13 @@ export default {
         },
 
         async logIn() {
-            console.log("username = ", this.username.default)
+            console.log("email = ", this.email.default)
             console.log("password = ", this.password.default)
             try {
-                // username: "admin",
+                // email: "admin",
                 // password: "password",
                 let payload = {
-                    username: this.username.default,
+                    email: this.email.default,
                     password: this.password.default
                 };
                 let res = await axios.post('http://localhost:4000/api/users/sign_in', payload);
@@ -101,9 +101,9 @@ import axios from 'axios';
                 <h1>LOGIN</h1>
             </div>
             <div class="text-content">
-                <p class="text-input">Username</p>
+                <p class="text-input">Email</p>
                 <div id="email">
-                    <input v-model="username.default" type="text" placeholder="Type your Email"
+                    <input v-model="email.default" type="text" placeholder="Type your Email"
                         class="input hover:border-yellow input-ghost w-full max-w-xs" />
                 </div>
                 <p class="text-input">Password</p>
